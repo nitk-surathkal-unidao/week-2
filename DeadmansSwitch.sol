@@ -48,4 +48,5 @@ contract DeadmansSwitch {
     }
 }
 
-//address of contract on sepolia faucet testnet=0xec766fE4cf66646BE1D02E98E8BD6105cAe41F52
+//The contract facilitates secure Ether transfer to a designated beneficiary if the owner fails to check in regularly.
+// Address of the smart contract deployed on sepolia faucnet=0xec766fE4cf66646BE1D02E98E8BD6105cAe41F52
