@@ -2,34 +2,40 @@
 pragma solidity ^0.8.0;
 
 contract DeadmansSwitch {
-    // TODO: Declare state variables
-    // Hint: You'll need variables for the owner, beneficiary, and last check-in block
+    // Declare state variables
+    address public owner;
+    address public beneficiary;
+    uint256 public lastCheckInBlock;
+    uint256 public checkInPeriod = 10;  // Number of blocks after which funds are released
 
-    // TODO: Implement constructor
+    // Constructor to initialize the owner and beneficiary
     constructor(address _beneficiary) {
-        // Hint: Initialize state variables
+        owner = msg.sender;  // Owner is the person who deploys the contract
+        beneficiary = _beneficiary;  // Beneficiary is passed as an argument
+        lastCheckInBlock = block.number;  // Initialize the last check-in block
     }
 
-    // TODO: Implement still_alive function
+    // Function to be called by the owner to indicate they are still alive
     function still_alive() public {
-        // Hint: Update the last check-in block
+        require(msg.sender == owner, "Only the owner can check-in.");
+        lastCheckInBlock = block.number;  // Update last check-in block
     }
 
-    // TODO: Implement release funds function
+    // Function to release funds to the beneficiary if enough blocks have passed
     function releaseFunds() public {
-        // Hint: Check if 10 blocks have passed since last check-in
-        // If so, transfer the contract balance to the beneficiary
+        require(block.number > lastCheckInBlock + checkInPeriod, "Owner is still alive or not enough blocks have passed.");
+        payable(beneficiary).transfer(address(this).balance);  // Transfer all contract balance to beneficiary
     }
 
-    // TODO: Implement receive function to allow the contract to receive Ether
+    // Allow contract to receive Ether
     receive() external payable {}
 
-    // Helper function for testing (optional)
+    // Helper function to return the last check-in block
     function getLastCheckInBlock() public view returns (uint256) {
-        // TODO: Return the last check-in block
+        return lastCheckInBlock;
     }
 
-    // Helper function for testing (optional)
+    // Helper function to return the current block number
     function getCurrentBlock() public view returns (uint256) {
         return block.number;
     }
