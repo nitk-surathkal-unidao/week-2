@@ -2,34 +2,55 @@
 pragma solidity ^0.8.0;
 
 contract DeadmansSwitch {
-    // TODO: Declare state variables
-    // Hint: You'll need variables for the owner, beneficiary, and last check-in block
+    // State variables
+    address public owner;            // Owner of the contract
+    address public beneficiary;      // Beneficiary to receive funds
+    uint256 public lastCheckInBlock; // The block number when the owner last checked in
 
-    // TODO: Implement constructor
+    // Block interval that determines how long the owner has to check in
+    uint256 public constant blockInterval = 10;
+
+    // Boolean flag to indicate if the contract is deactivated
+    bool public isDeactivated = false;
+
+    // Constructor to initialize the contract with the beneficiary's address
     constructor(address _beneficiary) {
-        // Hint: Initialize state variables
+        owner = msg.sender;           // The deployer is the owner
+        beneficiary = _beneficiary;   // The beneficiary address is provided during deployment
+        lastCheckInBlock = block.number; // Set last check-in block to current block at deployment
     }
 
-    // TODO: Implement still_alive function
+    // Function to let the owner check in, proving they are still alive
     function still_alive() public {
-        // Hint: Update the last check-in block
+        require(msg.sender == owner, "Only the owner can call this function");
+        require(!isDeactivated, "Contract is deactivated");
+        lastCheckInBlock = block.number;  // Update the last check-in block to the current block
     }
 
-    // TODO: Implement release funds function
+    // Function to release funds to the beneficiary if the owner hasn't checked in for 10 blocks
     function releaseFunds() public {
-        // Hint: Check if 10 blocks have passed since last check-in
-        // If so, transfer the contract balance to the beneficiary
+        // Check if the contract is deactivated
+        require(!isDeactivated, "Contract is deactivated");
+
+        // Check if 10 blocks have passed since the last check-in
+        require(block.number > lastCheckInBlock + blockInterval, "Owner is still alive");
+
+        // Transfer all the contract's balance to the beneficiary
+        payable(beneficiary).transfer(address(this).balance);
+
+        // Mark the contract as deactivated to prevent further actions
+        isDeactivated = true;
     }
 
-    // TODO: Implement receive function to allow the contract to receive Ether
+    // Function to allow the contract to receive Ether
     receive() external payable {}
 
-    // Helper function for testing (optional)
+    // Helper function to get the last check-in block number
     function getLastCheckInBlock() public view returns (uint256) {
-        // TODO: Return the last check-in block
+        return lastCheckInBlock;
     }
 
-    // Helper function for testing (optional)
+    // Helper function to get the current block number
     function getCurrentBlock() public view returns (uint256) {
         return block.number;
     }
