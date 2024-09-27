@@ -21,6 +21,7 @@ contract DeadmansSwitch {
     // TODO: Implement still_alive function
     function still_alive() public {
         // Hint: Update the last check-in block
+        require(msg.sender == owner, "You are not the owner");
         last_block = block.number;
     }
 
