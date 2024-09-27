@@ -2,35 +2,40 @@
 pragma solidity ^0.8.0;
 
 contract DeadmansSwitch {
-    // TODO: Declare state variables
-    // Hint: You'll need variables for the owner, beneficiary, and last check-in block
+    address public owner;
+    address public beneficiary;
+    uint256 public lastCheckInBlock;
 
-    // TODO: Implement constructor
+    // initialize the contract with the beneficiary's address
     constructor(address _beneficiary) {
-        // Hint: Initialize state variables
+        owner = msg.sender; 
+        beneficiary = _beneficiary; // Initialize the beneficiary
+        lastCheckInBlock = block.number; 
     }
 
-    // TODO: Implement still_alive function
+    // Function for the owner to check in and update the last check-in block
     function still_alive() public {
-        // Hint: Update the last check-in block
+        require(msg.sender == owner, "Only the owner can check in");
+        lastCheckInBlock = block.number; 
     }
 
-    // TODO: Implement release funds function
+    // Function to release funds to the beneficiary if 10 blocks have passed since the last check-in
     function releaseFunds() public {
-        // Hint: Check if 10 blocks have passed since last check-in
-        // If so, transfer the contract balance to the beneficiary
+        require(block.number >= lastCheckInBlock + 10, "Not enough time has passed");
+        payable(beneficiary).transfer(address(this).balance);
     }
 
-    // TODO: Implement receive function to allow the contract to receive Ether
+    // Function to allow the contract to receive Ether
     receive() external payable {}
 
-    // Helper function for testing (optional)
+    // Helper function to get the last check-in block for testing
     function getLastCheckInBlock() public view returns (uint256) {
-        // TODO: Return the last check-in block
+        return lastCheckInBlock; 
     }
-
-    // Helper function for testing (optional)
+    
+    // Helper function to get the current block number for testing
     function getCurrentBlock() public view returns (uint256) {
-        return block.number;
+        return block.number; 
     }
 }
+
