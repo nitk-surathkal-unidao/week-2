@@ -30,7 +30,7 @@ contract DeadmansSwitch {
         // If so, transfer the contract balance to the beneficiary
         require(getCurrentBlock() > lastcheckinblock + checkperiod,
         "checkin period has not passed");
-        require(address(this).balance > 0, "no funds are available");
+        require(address(this).balance > 0);
         payable (beneficiary).transfer(address(this).balance);
     }
 
